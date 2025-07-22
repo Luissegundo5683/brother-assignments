@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Meeting Assignment Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 0 10px 10px 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .week-selector {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input[type="date"], input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .week-nav-btn {
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .week-nav-btn:hover {
+            background: #bdc3c7;
+        }
+        
+        .save-week-btn {
+            background: #27ae60;
+        }
+        
+        .save-week-btn:hover {
+            background: #229954;
+        }
+        
+        .assignment-grid {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .role-row {
+            display: grid;
+            grid-template-columns: 250px 1fr 150px;
+            gap: 15px;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .role-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .brother-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .assignment-status {
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .assigned {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .not-assigned {
+            color: #e74c3c;
+        }
+        
+        .eligible-count {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        .completion-status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+        }
+        
+        .status-complete {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .status-incomplete {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #34495e;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .saved-weeks {
+            margin-top: 30px;
+        }
+        
+        .saved-week-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .week-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .load-btn {
+            background: #3498db;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .print-week-group {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        
+        .print-role-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .share-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .print-note {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            body {
+                background: white;
+            }
+            
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            .tab-content {
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+            
+            .print-week-group h2 {
+                background: #34495e !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weekly Meeting Assignment Tracker</h1>
+        
+        <div class="tabs no-print">
+            <div class="tab active" onclick="showTab(event, 'assignments')">Weekly Assignments</div>
+            <div class="tab" onclick="showTab(event, 'brothers')">Brothers</div>
+            <div class="tab" onclick="showTab(event, 'dashboard')">Dashboard</div>
+            <div class="tab" onclick="showTab(event, 'print')">Print View</div>
+        </div>
+        
+        <!-- Weekly Assignments Tab -->
+        <div id="assignments" class="tab-content active">
+            <div class="week-selector">
+                <div class="form-group" style="margin: 0;">
+                    <label for="weekStart">Select Week:</label>
+                    <input type="date" id="weekStart" onchange="loadWeekAssignments()">
+                </div>
+                
+                <div class="form-group" style="margin: 0;">
+                    <label>Display Week:</label>
+                    <input type="text" id="displayWeek" readonly style="width: 250px;">
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="week-nav-btn" onclick="changeWeek(-1)">← Previous Week</button>
+                    <button class="week-nav-btn" onclick="changeWeek(1)">Next Week →</button>
+                </div>
+                
+                <button class="save-week-btn" onclick="saveWeekAssignments()">Save Week</button>
+            </div>
+            
+            <div class="completion-status" id="completionStatus"></div>
+            
+            <h2>Assign Brothers to Roles</h2>
+            <div class="assignment-grid" id="assignmentGrid"></div>
+            
+            <div class="saved-weeks">
+                <h2>Saved Weeks</h2>
+                <div id="savedWeeksList"></div>
+            </div>
+        </div>
+        
+        <!-- Brothers Tab -->
+        <div id="brothers" class="tab-content">
+            <h2>Brothers Management</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Micrófonos</th>
+                        <th>Plataforma</th>
+                        <th>Sonido</th>
+                        <th>Acomodador</th>
+                        <th>Assignments This Month</th>
+                    </tr>
+                </thead>
+                <tbody id="brothersTable"></tbody>
+            </table>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <h2>Assignment Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3>Department Overview</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="soundDeptCount">0</div>
+                            <div class="stat-label">Sound Dept</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="usherDeptCount">0</div>
+                            <div class="stat-label">Ushers</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-card">
+                    <h3>This Month's Stats</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalAssignments">0</div>
+                            <div class="stat-label">Total Assignments</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="uniqueBrothers">0</div>
+                            <div class="stat-label">Brothers Assigned</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card" style="margin-top: 20px;">
+                <h3>Most Active Brothers This Month</h3>
+                <div id="mostActiveBrothers"></div>
+            </div>
+        </div>
+        
+        <!-- Print View Tab -->
+        <div id="print" class="tab-content">
+            <h2>Print Preview</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="display: inline-flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="printCurrentWeekOnly" checked onchange="generatePrintView()">
+                    <span>Show only current week (uncheck to show all saved weeks)</span>
+                </label>
+            </div>
+            <button onclick="window.print()">Print This View</button>
+            <button onclick="shareView()" style="background: #27ae60; margin-left: 10px;">Copy for Sharing</button>
+            <div id="printContent" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Brothers data
+        const brothersData = [
+            { name: "Aidan Acosta", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Ari Gutierrez", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Arturo Pina", microfonos: true, plataforma: false, sonido: false, acomodador: false },
+            { name: "Carlos Montalvo", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Dani Gutierrez", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Daniel Gomez", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Daniel Ortiz", microfonos: true, plataforma: true, sonido: true, acomodador: true },
+            { name: "Ethan Acosta", microfonos: false, plataforma: false, sonido: false, acomodador: true },
+            { name: "Frank Figueroa", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Gayving Sanchez", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Ignacio Cisneros", microfonos: true, plataforma: true, sonido: true, acomodador: true },
+            { name: "Jaime Diaz", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Jesus Cardenas", microfonos: true, plataforma: true, sonido: true, acomodador: true },
+            { name: "Joel Cisneros", microfonos: true, plataforma: true, sonido: true, acomodador: true },
+            { name: "Jonah Martinez", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Luis Segundo", microfonos: true, plataforma: true, sonido: true, acomodador: true },
+            { name: "Marcial Acosta", microfonos: false, plataforma: false, sonido: false, acomodador: true },
+            { name: "Marcos Roman", microfonos: true, plataforma: true, sonido: true, acomodador: true },
+            { name: "Nahum Martinez", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Rafael Aguilar", microfonos: true, plataforma: true, sonido: true, acomodador: false },
+            { name: "Roberto Faria", microfonos: true, plataforma: true, sonido: true, acomodador: true },
+            { name: "Saul Cardenas", microfonos: false, plataforma: false, sonido: false, acomodador: true },
+            { name: "Saul Puga", microfonos: true, plataforma: false, sonido: false, acomodador: false },
+            { name: "Saul Rodriguez", microfonos: false, plataforma: false, sonido: false, acomodador: true },
+            { name: "Tony Cisneros", microfonos: true, plataforma: false, sonido: false, acomodador: false },
+            { name: "Wladimir Bravo", microfonos: false, plataforma: false, sonido: false, acomodador: true },
+            { name: "Alex Diaz", microfonos: false, plataforma: false, sonido: false, acomodador: true }
+        ];
+        
+        // Define all roles
+        const roles = [
+            { name: "Plataforma", skill: "plataforma" },
+            { name: "Micrófonos (Lado de Sonido)", skill: "microfonos" },
+            { name: "Micrófonos (Lado de Sala B)", skill: "microfonos" },
+            { name: "Sonido General", skill: "sonido" },
+            { name: "Acomodador Puerta Principal", skill: "acomodador" },
+            { name: "Acomodador Lado de Sala B", skill: "acomodador" },
+            { name: "Acomodador Lado de Sonido", skill: "acomodador" },
+            { name: "Cámara de Seguridad", skill: "acomodador" }
+        ];
+        
+        // Storage
+        let savedWeeks = {};
+        let currentWeekAssignments = {};
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setDefaultWeekDate();
+            renderBrothersTable();
+            updateDashboard();
+            loadWeekAssignments();
+        });
+        
+        // Set default week date
+        function setDefaultWeekDate() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+            const monday = new Date(today.setDate(diff));
+            
+            document.getElementById('weekStart').value = monday.toISOString().split('T')[0];
+            updateDisplayWeek();
+        }
+        
+        // Change week
+        function changeWeek(delta) {
+            const currentDate = new Date(document.getElementById('weekStart').value);
+            currentDate.setDate(currentDate.getDate() + (delta * 7));
+            document.getElementById('weekStart').value = currentDate.toISOString().split('T')[0];
+            loadWeekAssignments();
+        }
+        
+        // Update display week
+        function updateDisplayWeek() {
+            const weekStart = document.getElementById('weekStart').value;
+            if (!weekStart) return;
+            
+            const startDate = new Date(weekStart);
+            const endDate = new Date(weekStart);
+            endDate.setDate(endDate.getDate() + 3);
+            
+            const options = { month: 'long', day: 'numeric', year: 'numeric' };
+            const displayText = startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) + 
+                              '–' + endDate.toLocaleDateString('en-US', options);
+            
+            document.getElementById('displayWeek').value = displayText;
+            
+            return displayText;
+        }
+        
+        // Load week assignments
+        function loadWeekAssignments() {
+            updateDisplayWeek();
+            const weekStart = document.getElementById('weekStart').value;
+            
+            if (savedWeeks[weekStart]) {
+                currentWeekAssignments = Object.assign({}, savedWeeks[weekStart].assignments);
+            } else {
+                currentWeekAssignments = {};
+            }
+            
+            renderAssignmentGrid();
+            updateCompletionStatus();
+            renderSavedWeeks();
+        }
+        
+        // Render assignment grid
+        function renderAssignmentGrid() {
+            const grid = document.getElementById('assignmentGrid');
+            grid.innerHTML = '';
+            
+            roles.forEach(function(role) {
+                const roleRow = document.createElement('div');
+                roleRow.className = 'role-row';
+                
+                const assignedBrother = currentWeekAssignments[role.name] || '';
+                const eligibleBrothers = getEligibleBrothersForRole(role);
+                
+                const roleInfo = document.createElement('div');
+                roleInfo.innerHTML = '<div class="role-name">' + role.name + '</div>' +
+                                     '<div class="eligible-count">' + eligibleBrothers.length + ' eligible</div>';
+                
+                const select = document.createElement('select');
+                select.className = 'brother-select';
+                select.onchange = function() { assignBrother(role.name, this.value); };
+                
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Select a brother...';
+                select.appendChild(defaultOption);
+                
+                eligibleBrothers.forEach(function(brother) {
+                    const option = document.createElement('option');
+                    option.value = brother.name;
+                    option.textContent = brother.name + ' (' + brother.monthlyCount + ' this month)';
+                    if (brother.name === assignedBrother) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                
+                const status = document.createElement('div');
+                status.className = 'assignment-status';
+                if (assignedBrother) {
+                    status.innerHTML = '<span class="assigned">✓ Assigned</span>';
+                } else {
+                    status.innerHTML = '<span class="not-assigned">Not assigned</span>';
+                }
+                
+                roleRow.appendChild(roleInfo);
+                roleRow.appendChild(select);
+                roleRow.appendChild(status);
+                
+                grid.appendChild(roleRow);
+            });
+        }
+        
+        // Get eligible brothers for role
+        function getEligibleBrothersForRole(role) {
+            const assignedThisWeek = [];
+            
+            Object.keys(currentWeekAssignments).forEach(function(r) {
+                if (r !== role.name && currentWeekAssignments[r]) {
+                    assignedThisWeek.push(currentWeekAssignments[r]);
+                }
+            });
+            
+            const eligible = brothersData.filter(function(brother) {
+                return brother[role.skill] && assignedThisWeek.indexOf(brother.name) === -1;
+            }).map(function(brother) {
+                return {
+                    name: brother.name,
+                    monthlyCount: getMonthlyAssignmentCount(brother.name)
+                };
+            }).sort(function(a, b) {
+                return a.monthlyCount - b.monthlyCount;
+            });
+            
+            return eligible;
+        }
+        
+        // Assign brother
+        function assignBrother(roleName, brotherName) {
+            if (brotherName) {
+                currentWeekAssignments[roleName] = brotherName;
+            } else {
+                delete currentWeekAssignments[roleName];
+            }
+            
+            renderAssignmentGrid();
+            updateCompletionStatus();
+        }
+        
+        // Update completion status
+        function updateCompletionStatus() {
+            const status = document.getElementById('completionStatus');
+            const assignedCount = Object.values(currentWeekAssignments).filter(function(b) { return b; }).length;
+            const totalRoles = roles.length;
+            
+            if (assignedCount === totalRoles) {
+                status.className = 'completion-status status-complete';
+                status.innerHTML = '✓ All ' + totalRoles + ' roles assigned! Remember to save the week.';
+            } else {
+                status.className = 'completion-status status-incomplete';
+                status.innerHTML = assignedCount + ' of ' + totalRoles + ' roles assigned';
+            }
+        }
+        
+        // Save week assignments
+        function saveWeekAssignments() {
+            const weekStart = document.getElementById('weekStart').value;
+            const displayWeek = document.getElementById('displayWeek').value;
+            
+            const assignedCount = Object.values(currentWeekAssignments).filter(function(b) { return b; }).length;
+            if (assignedCount < roles.length) {
+                if (!confirm('Not all roles are assigned. Save anyway?')) {
+                    return;
+                }
+            }
+            
+            savedWeeks[weekStart] = {
+                weekStart: weekStart,
+                displayWeek: displayWeek,
+                assignments: Object.assign({}, currentWeekAssignments),
+                savedDate: new Date()
+            };
+            
+            alert('Week saved successfully!');
+            renderSavedWeeks();
+            updateDashboard();
+            renderBrothersTable();
+        }
+        
+        // Render saved weeks
+        function renderSavedWeeks() {
+            const list = document.getElementById('savedWeeksList');
+            const weeks = Object.values(savedWeeks).sort(function(a, b) {
+                return new Date(b.weekStart) - new Date(a.weekStart);
+            });
+            
+            if (weeks.length === 0) {
+                list.innerHTML = '<p style="color: #7f8c8d;">No saved weeks yet</p>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            weeks.forEach(function(week) {
+                const assignedCount = Object.values(week.assignments).filter(function(b) { return b; }).length;
+                
+                const item = document.createElement('div');
+                item.className = 'saved-week-item';
+                
+                const summary = document.createElement('div');
+                summary.innerHTML = '<strong>' + week.displayWeek + '</strong>' +
+                                   '<span style="color: #7f8c8d; margin-left: 10px;">' +
+                                   assignedCount + '/' + roles.length + ' roles assigned</span>';
+                
+                const actions = document.createElement('div');
+                actions.className = 'week-actions';
+                
+                const loadBtn = document.createElement('button');
+                loadBtn.className = 'load-btn';
+                loadBtn.textContent = 'Load';
+                loadBtn.onclick = function() { loadSavedWeek(week.weekStart); };
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.onclick = function() { deleteSavedWeek(week.weekStart); };
+                
+                actions.appendChild(loadBtn);
+                actions.appendChild(deleteBtn);
+                
+                item.appendChild(summary);
+                item.appendChild(actions);
+                
+                list.appendChild(item);
+            });
+        }
+        
+        // Load saved week
+        function loadSavedWeek(weekStart) {
+            document.getElementById('weekStart').value = weekStart;
+            loadWeekAssignments();
+        }
+        
+        // Delete saved week
+        function deleteSavedWeek(weekStart) {
+            if (confirm('Delete this saved week?')) {
+                delete savedWeeks[weekStart];
+                renderSavedWeeks();
+                updateDashboard();
+                renderBrothersTable();
+            }
+        }
+        
+        // Get monthly assignment count
+        function getMonthlyAssignmentCount(brotherName) {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            let count = 0;
+            
+            Object.values(savedWeeks).forEach(function(week) {
+                const weekDate = new Date(week.weekStart);
+                if (weekDate.getMonth() === currentMonth && weekDate.getFullYear() === currentYear) {
+                    Object.values(week.assignments).forEach(function(assignedBrother) {
+                        if (assignedBrother === brotherName) count++;
+                    });
+                }
+            });
+            
+            return count;
+        }
+        
+        // Show tab
+        function showTab(event, tabName) {
+            document.querySelectorAll('.tab').forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(function(content) {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'print') {
+                generatePrintView();
+            }
+        }
+        
+        // Render brothers table
+        function renderBrothersTable() {
+            const tbody = document.getElementById('brothersTable');
+            tbody.innerHTML = '';
+            
+            brothersData.forEach(function(brother) {
+                const assignmentCount = getMonthlyAssignmentCount(brother.name);
+                const row = document.createElement('tr');
+                row.innerHTML = '<td>' + brother.name + '</td>' +
+                               '<td>' + (brother.microfonos ? '✓' : '✗') + '</td>' +
+                               '<td>' + (brother.plataforma ? '✓' : '✗') + '</td>' +
+                               '<td>' + (brother.sonido ? '✓' : '✗') + '</td>' +
+                               '<td>' + (brother.acomodador ? '✓' : '✗') + '</td>' +
+                               '<td>' + assignmentCount + '</td>';
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Update dashboard
+        function updateDashboard() {
+            // Count departments
+            let soundDept = 0;
+            let usherDept = 0;
+            
+            brothersData.forEach(function(brother) {
+                if (brother.microfonos || brother.plataforma || brother.sonido) soundDept++;
+                if (brother.acomodador) usherDept++;
+            });
+            
+            document.getElementById('soundDeptCount').textContent = soundDept;
+            document.getElementById('usherDeptCount').textContent = usherDept;
+            
+            // Monthly stats
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            let totalAssignments = 0;
+            const uniqueBrothers = new Set();
+            
+            Object.values(savedWeeks).forEach(function(week) {
+                const weekDate = new Date(week.weekStart);
+                if (weekDate.getMonth() === currentMonth && weekDate.getFullYear() === currentYear) {
+                    Object.values(week.assignments).forEach(function(brother) {
+                        if (brother) {
+                            totalAssignments++;
+                            uniqueBrothers.add(brother);
+                        }
+                    });
+                }
+            });
+            
+            document.getElementById('totalAssignments').textContent = totalAssignments;
+            document.getElementById('uniqueBrothers').textContent = uniqueBrothers.size;
+            
+            // Most active brothers
+            const brotherCounts = {};
+            Object.values(savedWeeks).forEach(function(week) {
+                const weekDate = new Date(week.weekStart);
+                if (weekDate.getMonth() === currentMonth && weekDate.getFullYear() === currentYear) {
+                    Object.values(week.assignments).forEach(function(brother) {
+                        if (brother) {
+                            brotherCounts[brother] = (brotherCounts[brother] || 0) + 1;
+                        }
+                    });
+                }
+            });
+            
+            const sortedBrothers = Object.entries(brotherCounts)
+                .sort(function(a, b) { return b[1] - a[1]; })
+                .slice(0, 5);
+            
+            const mostActiveDiv = document.getElementById('mostActiveBrothers');
+            mostActiveDiv.innerHTML = '';
+            
+            sortedBrothers.forEach(function(entry) {
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.justifyContent = 'space-between';
+                div.style.padding = '10px';
+                div.style.borderBottom = '1px solid #eee';
+                div.innerHTML = '<span>' + entry[0] + '</span><span>' + entry[1] + ' assignments</span>';
+                mostActiveDiv.appendChild(div);
+            });
+        }
+        
+        // Generate print view
+        function generatePrintView() {
+            const printContent = document.getElementById('printContent');
+            
+            // Check if we should show current week or all saved weeks
+            const showCurrentWeek = document.getElementById('printCurrentWeekOnly').checked;
+            
+            let weeks = [];
+            
+            if (showCurrentWeek) {
+                // Show only current week (even if not saved)
+                const currentWeekStart = document.getElementById('weekStart').value;
+                const currentDisplayWeek = document.getElementById('displayWeek').value;
+                
+                if (Object.keys(currentWeekAssignments).length > 0) {
+                    weeks.push({
+                        weekStart: currentWeekStart,
+                        displayWeek: currentDisplayWeek,
+                        assignments: currentWeekAssignments
+                    });
+                }
+            } else {
+                // Show all saved weeks
+                weeks = Object.values(savedWeeks).sort(function(a, b) {
+                    return new Date(a.weekStart) - new Date(b.weekStart);
+                });
+            }
+            
+            let html = '<div class="print-header">';
+            html += '<h1>Asignaciones para las Reuniones</h1>';
+            html += '<h2>Weekly Meeting Assignments</h2>';
+            html += '</div>';
+            
+            // Add the Spanish note
+            html += '<div class="print-note">';
+            html += '<p style="font-style: italic; color: #2c3e50; margin: 0; line-height: 1.8;">';
+            html += 'Por favor, déjenme saber si el día de reunión anticipan llegar tarde a su asignación o si no podrán ese día. ';
+            html += 'Esto nos permitirá organizar a otro hermano para cubrir hasta su llegada o para toda la reunión si no podrán asistir.';
+            html += '</p>';
+            html += '</div>';
+            
+            if (weeks.length === 0) {
+                html += '<p style="text-align: center; color: #7f8c8d;">No assignments to display</p>';
+            } else {
+                weeks.forEach(function(week) {
+                    html += '<div class="print-week-group">';
+                    html += '<h2 style="background: #34495e; color: white; padding: 15px; margin: 0; border-radius: 8px 8px 0 0;">' + week.displayWeek + '</h2>';
+                    html += '<div style="border: 1px solid #ddd; border-top: none; padding: 20px;">';
+                    
+                    // Sound Department
+                    html += '<h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px;">Departamento de Sonido / Sound Department</h3>';
+                    
+                    ['Plataforma', 'Micrófonos (Lado de Sonido)', 'Micrófonos (Lado de Sala B)', 'Sonido General'].forEach(function(roleName) {
+                        if (week.assignments[roleName]) {
+                            html += '<div class="print-role-item">';
+                            html += '<span style="font-weight: 600; color: #555;">' + roleName + ':</span>';
+                            html += '<span style="color: #2c3e50; font-weight: 500;">' + week.assignments[roleName] + '</span>';
+                            html += '</div>';
+                        }
+                    });
+                    
+                    // Ushers Department
+                    html += '<h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-top: 20px;">Departamento de Acomodadores / Ushers Department</h3>';
+                    
+                    ['Acomodador Puerta Principal', 'Acomodador Lado de Sala B', 'Acomodador Lado de Sonido', 'Cámara de Seguridad'].forEach(function(roleName) {
+                        if (week.assignments[roleName]) {
+                            html += '<div class="print-role-item">';
+                            html += '<span style="font-weight: 600; color: #555;">' + roleName + ':</span>';
+                            html += '<span style="color: #2c3e50; font-weight: 500;">' + week.assignments[roleName] + '</span>';
+                            html += '</div>';
+                        }
+                    });
+                    
+                    html += '</div>';
+                    html += '</div>';
+                });
+            }
+            
+            // Add footer with print date
+            html += '<div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #7f8c8d; font-size: 12px;">';
+            html += 'Printed on ' + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            html += '</div>';
+            
+            printContent.innerHTML = html;
+        }
+        
+        // Share view function
+        function shareView() {
+            const content = document.getElementById('printContent').innerText;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(content).then(function() {
+                // Show notification
+                const notification = document.createElement('div');
+                notification.className = 'share-notification';
+                notification.textContent = 'Assignments copied to clipboard!';
+                document.body.appendChild(notification);
+                notification.style.display = 'block';
+                
+                setTimeout(function() {
+                    notification.style.display = 'none';
+                    document.body.removeChild(notification);
+                }, 3000);
+            }).catch(function(err) {
+                alert('Could not copy to clipboard. Please use the print function instead.');
+            });
+        }
+    </script>
+</body>
+</html>
