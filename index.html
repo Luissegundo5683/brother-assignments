@@ -419,8 +419,8 @@
                             <div class="stat-label">Sound Dept</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value" id="usherDeptCount">0</div>
-                            <div class="stat-label">Ushers</div>
+                            <div class="stat-value" id="AttendantDeptCount">0</div>
+                            <div class="stat-label">Attendants</div>
                         </div>
                     </div>
                 </div>
@@ -818,15 +818,15 @@
         function updateDashboard() {
             // Count departments
             let soundDept = 0;
-            let usherDept = 0;
+            let AttendantDept = 0;
             
             brothersData.forEach(function(brother) {
                 if (brother.microfonos || brother.plataforma || brother.sonido) soundDept++;
-                if (brother.acomodador) usherDept++;
+                if (brother.acomodador) AttendantDept++;
             });
             
             document.getElementById('soundDeptCount').textContent = soundDept;
-            document.getElementById('usherDeptCount').textContent = usherDept;
+            document.getElementById('AttendantDeptCount').textContent = AttendantDept;
             
             // Monthly stats
             const currentMonth = new Date().getMonth();
